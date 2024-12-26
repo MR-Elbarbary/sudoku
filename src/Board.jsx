@@ -1,12 +1,23 @@
 // Board.js
 import React from "react";
+import { isValidMove } from "./module";
 import "./Board.css";
 
 const Board = ({ board, setBoard }) => {
     const handleChange = (squareIndex, rowIndex, cellIndex, value) => {
+      const newValue = parseInt(value) || 0;
+      if (newValue === 0){
         const newBoard = [...board];
-        newBoard[squareIndex][rowIndex][cellIndex] = parseInt(value) || 0;
+        newBoard[squareIndex][rowIndex][cellIndex] = 0;
         setBoard(newBoard);
+        return;
+      } else if (isValidMove(board, squareIndex, rowIndex, cellIndex, newValue)) {
+        const newBoard = [...board];
+        newBoard[squareIndex][rowIndex][cellIndex] = newValue;
+        setBoard(newBoard);
+      } else {
+        alert("Invalid move");
+      }
       };
 
   return (
