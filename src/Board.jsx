@@ -3,7 +3,7 @@ import React from "react";
 import { isValidMove } from "./module";
 import "./Board.css";
 
-const Board = ({ board, setBoard }) => {
+export default function Board({ board, setBoard }){
     const handleChange = (squareIndex, rowIndex, cellIndex, value) => {
       const newValue = parseInt(value) || 0;
       if (newValue === 0){
@@ -43,5 +43,3 @@ const Board = ({ board, setBoard }) => {
     </div>
   );
 };
-
-export default Board;
