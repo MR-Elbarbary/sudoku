@@ -156,7 +156,6 @@ export const isValidMoveBoard = (board, square, row, col, value) => {
     isValidInRow(board, square, col, value) &&
     isValidInColumn(board, square, row, value) &&
     isValidInSquare(board, square, value) &&
-    solveSudokuBoard(board)
   );
 };
 

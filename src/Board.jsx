@@ -1,6 +1,6 @@
 // Board.js
 import React from "react";
-import { isValidMoveBoard } from "./module";
+import { isValidMoveBoard, solveSudokuBoard } from "./module";
 import "./Board.css";
 
 export default function Board({ board, setBoard }){
@@ -14,7 +14,11 @@ export default function Board({ board, setBoard }){
       } else if (isValidMoveBoard(board, squareIndex, rowIndex, cellIndex, newValue)) {
         const newBoard = [...board];
         newBoard[squareIndex][rowIndex][cellIndex] = newValue;
+        if(solveSudokuBoard(newBoard)){
         setBoard(newBoard);
+        } else {
+          alert("Invalid move");
+        }
       } else {
         alert("Invalid move");
       }
