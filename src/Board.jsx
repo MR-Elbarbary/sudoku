@@ -13,9 +13,11 @@ export default function Board({ board, setBoard }){
         return;
       } else if (isValidMoveBoard(board, squareIndex, rowIndex, cellIndex, newValue)) {
         const newBoard = [...board];
+        const nextBoard = JSON.parse(JSON.stringify(board));
         newBoard[squareIndex][rowIndex][cellIndex] = newValue;
+        nextBoard[squareIndex][rowIndex][cellIndex] = newValue;
         if(solveSudokuBoard(newBoard)){
-        setBoard(newBoard);
+        setBoard(nextBoard);
         } else {
           alert("Invalid move");
         }
