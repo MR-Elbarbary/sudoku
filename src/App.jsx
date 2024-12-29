@@ -2,55 +2,11 @@ import { useState } from 'react'
 import './App.css'
 import Board from './Board'
 import Settings from './Settings';
+import { generatePuzzle } from './module';
 
 function App() {
 
-  const [board, setBoard] = useState([
-    [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
-    ],
-    [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
-    ],
-    [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
-    ],
-    [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
-    ],
-    [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
-    ],
-    [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
-    ],
-    [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
-    ],
-    [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
-    ],
-    [
-      [0, 0, 0],
-      [0, 0, 0],
-      [0, 0, 0],
-  ]]);
+  const [board, setBoard] = useState(generatePuzzle());
 
   return (
     <>

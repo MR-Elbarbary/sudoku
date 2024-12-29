@@ -1,6 +1,6 @@
 // Board.js
 import React from "react";
-import { isValidMove } from "./module";
+import { isValidMoveBoard } from "./module";
 import "./Board.css";
 
 export default function Board({ board, setBoard }){
@@ -11,7 +11,7 @@ export default function Board({ board, setBoard }){
         newBoard[squareIndex][rowIndex][cellIndex] = 0;
         setBoard(newBoard);
         return;
-      } else if (isValidMove(board, squareIndex, rowIndex, cellIndex, newValue)) {
+      } else if (isValidMoveBoard(board, squareIndex, rowIndex, cellIndex, newValue)) {
         const newBoard = [...board];
         newBoard[squareIndex][rowIndex][cellIndex] = newValue;
         setBoard(newBoard);

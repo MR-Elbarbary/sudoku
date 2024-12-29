@@ -57,10 +57,10 @@ const generateSolvedBoard = () => {
   return board;
 };
 
-const generatePuzzle = (difficulty = "medium") => {
+export const generatePuzzle = (difficulty = 35) => {
   const solvedBoard = generateSolvedBoard();
   const puzzleBoard = JSON.parse(JSON.stringify(solvedBoard));
-  let removalCount = getRemovalCount(difficulty);
+  let removalCount = difficulty;
 
   const cells = Array.from({ length: 81 }, (_, idx) => [Math.floor(idx / 9), idx % 9]);
   cells.sort(() => Math.random() - 0.5);
@@ -72,21 +72,8 @@ const generatePuzzle = (difficulty = "medium") => {
     if (!hasUniqueSolution(puzzleBoard)) puzzleBoard[row][col] = temp; // Restore if no unique solution
     else removalCount--;
   }
-
-  return puzzleBoard;
-};
-
-const getRemovalCount = (difficulty) => {
-  switch (difficulty) {
-    case 'easy':
-      return 35;
-    case 'medium':
-      return 45;
-    case 'hard':
-      return 55;
-    default:
-      return 45;
-  }
+  let newboard = convertTo3x3Array(puzzleBoard);
+  return newboard;
 };
 
 
@@ -127,4 +114,79 @@ function convertTo3x3Array(array) {
     result.push(subgrid);
   }
   return result;
+}
+
+export const isValidInRow = (board, square, col, value) => {
+  const squareMod = square % 3;
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[i*3+squareMod][j][col] === value) {
+        return false;
+      }
+    }
+  }
+  return true;
+};
+
+export const isValidInColumn = (board, square, row, value) => {
+  const startSquare = Math.floor((square / 3));
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[i+startSquare*3][row][j] === value) {
+        return false;
+      }
+    }
+  }
+  return true;
+};
+
+export const isValidInSquare = (board, square, value) => {  
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      if (board[square][i][j] === value) {
+        return false;
+      }
+    }
+  }
+  return true;
+};
+
+export const isValidMoveBoard = (board, square, row, col, value) => {
+  return (
+    isValidInRow(board, square, col, value) &&
+    isValidInColumn(board, square, row, value) &&
+    isValidInSquare(board, square, value)
+  );
+};
+
+export function solveSudokuBoard(board) {
+  const emptyCell = findEmptyCellBoard(board);
+  if (emptyCell === null) {
+    return true;
+  }
+  const [square, row, col] = emptyCell;
+  for (let num = 1; num <= 9; num++) {
+    if (isValidMoveBoard(board, square, row, col, num)) {
+      board[square][row][col] = num;
+      if (solveSudokuBoard(board)) {
+        return true;
+      }
+      board[square][row][col] = 0;
+    }
+  }
+  return false;
+}
+
+
+function findEmptyCellBoard(board) {
+for (let square = 0; square < 9; square++) {
+    for (let row = 0; row < 3; row++) {
+        for (let col = 0; col < 3; col++) {
+            if (board[square][row][col] === 0) {
+                return [square, row, col];
+            }
+        }
+    }
+}
+return null;
 }
