@@ -114,3 +114,17 @@ const hasUniqueSolution = (board) => {
   solveAndCount(JSON.parse(JSON.stringify(board)));
   return solutionCount === 1;
 };
+
+function convertTo3x3Array(array) {
+  let result = [];
+  for (let i = 0; i < 9; i++) {
+    let rowStart = Math.floor(i / 3) * 3;
+    let colStart = (i % 3) * 3;
+    let subgrid = [];
+    for (let r = rowStart; r < rowStart + 3; r++) {
+      subgrid.push(array[r].slice(colStart, colStart + 3));
+    }
+    result.push(subgrid);
+  }
+  return result;
+}
