@@ -1,0 +1,12 @@
+.settings{
+    display: flex;
+    justify-content: space-between;
+}
+
+.generate{
+    background-color: #ee6677;
+}
+
+.solve{
+ background-color: #18bc9c;
+}
