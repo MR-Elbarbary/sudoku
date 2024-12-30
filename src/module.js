@@ -160,23 +160,45 @@ export const isValidMoveBoard = (board, square, row, col, value) => {
 };
 
 export function solveSudokuBoard(board) {
+  const root = { children: [] }; // Root of the decision tree
+  const success = solveHelper(board, root);
+  if (success) {
+    console.log(JSON.stringify(root, null, 2)); // Print the tree in a readable format
+  }
+  return success;
+}
+
+function solveHelper(board, node) {
   const emptyCell = findEmptyCellBoard(board);
   if (emptyCell === null) {
+    node.state = JSON.parse(JSON.stringify(board)); // Leaf node: store solved board state
     return true;
   }
+
   const [square, row, col] = emptyCell;
+  node.square = square;
+  node.row = row;
+  node.col = col;
+  node.children = []; // Children represent different decisions
+
   for (let num = 1; num <= 9; num++) {
     if (isValidMoveBoard(board, square, row, col, num)) {
       board[square][row][col] = num;
-      if (solveSudokuBoard(board)) {
-        return true;
+
+      // Create a child node for this decision
+      const childNode = { num, square, row, col, children: [] };
+      node.children.push(childNode);
+
+      if (solveHelper(board, childNode)) {
+        return true; // Solution found, propagate success
       }
-      board[square][row][col] = 0;
+
+      board[square][row][col] = 0; // Backtrack
     }
   }
-  return false;
-}
 
+  return false; // No valid number found for this cell
+}
 
 function findEmptyCellBoard(board) {
 for (let square = 0; square < 9; square++) {
@@ -189,4 +211,59 @@ for (let square = 0; square < 9; square++) {
     }
 }
 return null;
+}
+
+
+export function ac3(X, D, R1, R2) {
+  // Initial domains are made consistent with unary constraints.
+  for (const x of X) {
+      D[x] = D[x].filter(vx => R1(x, vx)); // Filter domain D(x) based on R1 constraints
+  }
+
+  // Worklist contains all arcs we wish to prove consistent or not.
+  let worklist = [];
+  for (const x of X) {
+      for (const y of X) {
+          if (x !== y && (R2(x, y) || R2(y, x))) {
+              worklist.push([x, y]);
+          }
+      }
+  }
+
+  // Process the worklist
+  while (worklist.length > 0) {
+      const [x, y] = worklist.pop();
+
+      if (arcReduce(x, y, D, R2)) {
+          if (D[x].length === 0) {
+              return false; // Failure: Domain for x is empty
+          }
+
+          // Add related arcs back to the worklist
+          for (const z of X) {
+              if (z !== y && (R2(x, z) || R2(z, x))) {
+                  worklist.push([z, x]);
+              }
+          }
+      }
+  }
+
+  return true; // Success: Domains are arc-consistent
+}
+
+function arcReduce(x, y, D, R2) {
+  let change = false;
+
+  // Iterate over each value in D(x)
+  for (let i = D[x].length - 1; i >= 0; i--) {
+      const vx = D[x][i];
+      const isConsistent = D[y].some(vy => R2(x, y, vx, vy)); // Check for consistency
+
+      if (!isConsistent) {
+          D[x].splice(i, 1); // Remove vx from D(x)
+          change = true;
+      }
+  }
+
+  return change;
 }
