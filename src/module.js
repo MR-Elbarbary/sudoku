@@ -213,44 +213,6 @@ for (let square = 0; square < 9; square++) {
 return null;
 }
 
-
-export function ac3(X, D, R1, R2) {
-  // Initial domains are made consistent with unary constraints.
-  for (const x of X) {
-      D[x] = D[x].filter(vx => R1(x, vx)); // Filter domain D(x) based on R1 constraints
-  }
-
-  // Worklist contains all arcs we wish to prove consistent or not.
-  let worklist = [];
-  for (const x of X) {
-      for (const y of X) {
-          if (x !== y && (R2(x, y) || R2(y, x))) {
-              worklist.push([x, y]);
-          }
-      }
-  }
-
-  // Process the worklist
-  while (worklist.length > 0) {
-      const [x, y] = worklist.pop();
-
-      if (arcReduce(x, y, D, R2)) {
-          if (D[x].length === 0) {
-              return false; // Failure: Domain for x is empty
-          }
-
-          // Add related arcs back to the worklist
-          for (const z of X) {
-              if (z !== y && (R2(x, z) || R2(z, x))) {
-                  worklist.push([z, x]);
-              }
-          }
-      }
-  }
-
-  return true; // Success: Domains are arc-consistent
-}
-
 function arcReduce(x, y, D, R2) {
   let change = false;
 
@@ -263,6 +225,106 @@ function arcReduce(x, y, D, R2) {
           D[x].splice(i, 1); // Remove vx from D(x)
           change = true;
       }
+  }
+
+  return change;
+}
+
+function initializeDomains(board) {
+  const domains = {};
+  for (let square = 0; square < 3; square++) {
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        const key = `${square}-${row}-${col}`;
+        domains[key] = board[square][row][col] === 0
+          ? [1, 2, 3, 4, 5, 6, 7, 8, 9]
+          : [board[square][row][col]];
+      }
+    }
+  }
+  return domains;
+}
+
+function getAllCells() {
+  const cells = [];
+  for (let square = 0; square < 3; square++) {
+    for (let row = 0; row < 3; row++) {
+      for (let col = 0; col < 3; col++) {
+        cells.push(`${square}-${row}-${col}`);
+      }
+    }
+  }
+  return cells;
+}
+
+function isValidUnaryConstraint(board, cell, value) {
+  const [square, row, col] = cell.split("-").map(Number);
+  return isValidMoveBoard(board, square, row, col, value);
+}
+
+// Check binary constraints (e.g., Sudoku rules)
+function isValidBinaryConstraint(cell1, cell2, value1, value2) {
+  const [square1, row1, col1] = cell1.split("-").map(Number);
+  const [square2, row2, col2] = cell2.split("-").map(Number);
+
+  // Same row
+  if (row1 === row2 && square1 === square2) return value1 !== value2;
+  // Same column
+  if (col1 === col2 && square1 === square2) return value1 !== value2;
+  // Same 3x3 box
+  if (square1 === square2) return value1 !== value2;
+
+  return true; // No conflict
+}
+
+function ac3(X, D, R1, R2) {
+  // Initial domains are made consistent with unary constraints.
+  for (const x of X) {
+    D[x] = D[x].filter(vx => R1(x, vx)); // Filter domain D(x) based on R1 constraints
+  }
+
+  // Worklist contains all arcs we wish to prove consistent or not.
+  let worklist = [];
+  for (const x of X) {
+    for (const y of X) {
+      if (x !== y && (R2(x, y) || R2(y, x))) {
+        worklist.push([x, y]);
+      }
+    }
+  }
+
+  // Process the worklist
+  while (worklist.length > 0) {
+    const [x, y] = worklist.pop();
+
+    if (arcReduce(x, y, D, R2)) {
+      if (D[x].length === 0) {
+        return false; // Failure: Domain for x is empty
+      }
+
+      // Add related arcs back to the worklist
+      for (const z of X) {
+        if (z !== y && (R2(x, z) || R2(z, x))) {
+          worklist.push([z, x]);
+        }
+      }
+    }
+  }
+
+  return true; // Success: Domains are arc-consistent
+}
+
+function arcReduce(x, y, D, R2) {
+  let change = false;
+
+  for (let i = D[x].length - 1; i >= 0; i--) {
+    const vx = D[x][i];
+    const isConsistent = D[y].some(vy => R2(x, y, vx, vy)); // Check for consistency
+
+    if (!isConsistent) {
+      D[x].splice(i, 1); // Remove vx from D(x)
+      change = true;
+    }
   }
 
   return change;
